@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FATH</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#10302D;--soft:#4B6663;--deep:#0A3F3B;--teal:#0E7C72;--teal2:#0B655D;--mint:#7FE0CF;--mist:#EEF5F3;--card:#fff;--line:#D3E3DE;--tab:#E4EEEB;--act:#5FA8B3;--red:#D93F4C;--fd:'Bricolage Grotesque',system-ui,sans-serif;--fb:'Figtree',system-ui,sans-serif}
+@media(prefers-color-scheme:dark){:root{--ink:#E3F1EE;--soft:#9DBBB5;--deep:#06201E;--mist:#0C1B1A;--card:#122927;--line:#244542;--tab:#163230;--act:#2C7F8C}}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;font-family:var(--fb);color:var(--ink);background:var(--mist);line-height:1.5}
+h1,h2,h3{font-family:var(--fd);margin:0;letter-spacing:-.01em;line-height:1.15}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid rgba(14,124,114,.5);outline-offset:2px}
+.in{width:100%;height:44px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+.btn{height:40px;padding:0 16px;border-radius:10px;border:1px solid transparent;background:var(--teal);color:#fff;font-weight:600;cursor:pointer}
+.btn:hover{background:var(--teal2)}.btn.n{background:var(--card);color:var(--ink);border-color:var(--line)}.btn.n:hover{background:var(--tab)}
+.btn.s{height:34px;padding:0 12px;font-size:14px}
+#login{display:grid;grid-template-columns:1.05fr 1fr;min-height:100vh}
+.brand{background:#0A3F3B;color:#fff;padding:48px 56px;display:flex;flex-direction:column;justify-content:space-between}
+.brand h1{font-size:clamp(72px,11vw,140px);font-weight:800;letter-spacing:-.04em;line-height:.9}
+.brand p{color:#CFE9E4;font-size:19px;max-width:36ch;margin:18px 0 0}.brand small{color:#9CC4BD;max-width:46ch}
+.ecg{width:100%;height:110px;margin:28px 0}.ecg path{fill:none;stroke:#7FE0CF;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;animation:g 2.6s ease-out .3s forwards}
+@keyframes g{to{stroke-dashoffset:0}}@media(prefers-reduced-motion:reduce){.ecg path{animation:none;stroke-dashoffset:0}}
+.side{display:flex;align-items:center;justify-content:center;padding:24px}
+.lk{width:100%;max-width:400px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:32px}
+.lk h2{font-size:28px}.lk .sub{color:var(--soft);margin:8px 0 22px}
+label{display:block;font-weight:600;font-size:14px;margin:0 0 6px}.f{margin-bottom:16px}
+.err{min-height:22px;color:var(--red);font-size:14px;margin:0 0 10px}
+header{background:var(--deep);color:#fff;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--fd);font-weight:800;font-size:24px}
+.who{display:flex;align-items:center;gap:10px;font-size:14px;color:#CFE9E4}.who .btn.n{background:transparent;color:#fff;border-color:rgba(255,255,255,.3)}
+.tabs{display:flex;background:var(--tab);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.tabs .sc{border:0;background:transparent;width:36px;cursor:pointer;font-size:22px;color:var(--soft)}
+#tb{display:flex;overflow-x:auto;flex:1;scrollbar-width:none}#tb::-webkit-scrollbar{display:none}
+#tb button{display:flex;align-items:center;gap:10px;white-space:nowrap;border:0;background:transparent;padding:14px 20px;cursor:pointer;font-weight:500;font-size:16px;color:var(--ink);border-bottom:3px solid transparent}
+#tb button:hover{background:rgba(14,124,114,.12)}
+#tb button[aria-current=page]{background:var(--act);color:#fff;border-bottom-color:var(--mint)}
+main{padding:24px;max-width:1200px;margin:0 auto}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:18px}
+.bar h2{font-size:28px}.ak{display:flex;gap:8px;flex-wrap:wrap}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+.card h3{font-size:18px;margin-bottom:12px}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:16px}
+.kpi .card{margin:0}.kpi b{display:block;font-family:var(--fd);font-size:34px;line-height:1.15}.kpi span{color:var(--soft);font-size:14px;display:block}
+.g2{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}.g2>.card{margin-bottom:16px}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14.5px}
+th{text-align:left;color:var(--soft);font-weight:600;padding:8px 10px;border-bottom:2px solid var(--line);white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid var(--line)}tr.tot td{font-weight:700;background:var(--tab)}
+.pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:13px;font-weight:600;background:#D7EEE9;color:#0A524B;white-space:nowrap}
+.pill.k{background:#FBE3E5;color:#9D2631}.pill.w{background:#FCEFCB;color:#7A5300}
+.rek{padding:12px 0;border-bottom:1px solid var(--line)}.rek:last-child{border:0}.rek b{margin-left:8px}.rek p{margin:6px 0 0;color:var(--soft)}
+#map{height:460px;border-radius:12px;border:1px solid var(--line)}
+.note{color:var(--soft);font-size:14px;margin:12px 0 0}.chips{display:flex;gap:8px;margin:10px 0 14px;flex-wrap:wrap;align-items:center}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:4px 14px;cursor:pointer;font-size:14px}.chip[aria-pressed=true]{background:var(--teal);color:#fff;border-color:var(--teal)}
+.sel{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}.sel>div{min-width:200px}
+.sy{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);align-items:center}.sy:last-child{border:0}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#10302D;color:#fff;padding:10px 18px;border-radius:10px;z-index:9999;max-width:90vw}
+dialog{border:1px solid var(--line);border-radius:16px;padding:26px;width:min(420px,92vw);background:var(--card);color:var(--ink)}
+dialog::backdrop{background:rgba(10,63,59,.45)}
+@media(max-width:860px){#login{grid-template-columns:1fr}.brand{padding:28px 22px}.g2{grid-template-columns:1fr!important}main{padding:16px}}
+</style>
+</head>
+<body>
+
+<section id="login">
+  <div class="brand">
+    <div><h1>FATH</h1><p>Audit kelengkapan rekam medis, kodifikasi ICD, peta sebaran, dan indikator rawat inap dalam satu portal.</p></div>
+    <svg class="ecg" viewBox="0 0 600 120" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M0 62H130L150 62L166 24L192 104L214 40L230 62H370L388 62L404 30L426 92L444 62H600"/></svg>
+    <small>Prototype Project Day Manajemen Informasi Kesehatan. Seluruh data bawaan adalah data simulasi.</small>
+  </div>
+  <div class="side">
+    <form class="lk" id="fl" novalidate>
+      <h2>Masuk ke FATH</h2>
+      <p class="sub">Portal khusus admin.</p>
+      <div class="f"><label for="u">Username</label><input class="in" id="u" autocomplete="username" autocapitalize="none" spellcheck="false"></div>
+      <div class="f"><label for="p">Password</label><input class="in" id="p" type="password" autocomplete="current-password"></div>
+      <p class="err" id="el" role="alert"></p>
+      <button class="btn" style="width:100%;height:44px" type="submit">Masuk</button>
+    </form>
+  </div>
+</section>
+
+<div id="app" hidden>
+  <header>
+    <div class="logo"><svg width="34" height="34" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="11" fill="#0E7C72"/><path d="M6 22H13L17 13L22 29L26 18L28 22H34" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>FATH</div>
+    <div class="who"><span>Admin</span><button class="btn n s" id="bpw">Ganti password</button><button class="btn n s" id="bout">Keluar</button></div>
+  </header>
+  <nav class="tabs" aria-label="Menu utama"><button class="sc" id="kiri" aria-label="Geser kiri">&#8249;</button><div id="tb"></div><button class="sc" id="kanan" aria-label="Geser kanan">&#8250;</button></nav>
+  <main id="mn"></main>
+</div>
+
+<dialog id="dpw"><form id="fpw" novalidate>
+  <h2 style="margin-bottom:16px">Ganti password</h2>
+  <div class="f"><label for="pl">Password lama</label><input class="in" id="pl" type="password"></div>
+  <div class="f"><label for="pb">Password baru (min. 8 karakter)</label><input class="in" id="pb" type="password"></div>
+  <p class="err" id="epw"></p>
+  <div style="display:flex;gap:10px;justify-content:flex-end"><button type="button" class="btn n" id="bx">Batal</button><button class="btn">Simpan</button></div>
+</form></dialog>
+<div id="toast" hidden role="status"></div>
+<input type="file" id="fx" accept=".xlsx,.xls,.csv" hidden>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+/* ===== PENGATURAN ===== */
+const CFG={user:'admin',pwAwal:'admin123',idleMenit:30,maksGagal:5,kunciDetik:60};
+const KD='fath_data_v3',KU='fath_pw_v1',KS='fath_sesi';
+/* Kolom berkas yang BUKAN komponen audit. Kolom lain di sheet "rm" dianggap komponen kelengkapan. */
+const TETAP=['no_rm','nama','unit','kecamatan','tgl_masuk','tgl_keluar','kode_dx','kode_tindakan'];
+
+/* ===== UTIL ===== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const f=(v,d=1)=>v==null||!isFinite(v)?'-':v.toFixed(d).replace('.',',');
+const dn=s=>{const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(String(s||''));return m?Date.UTC(+m[1],m[2]-1,+m[3])/864e5:null};
+const iso=n=>new Date(n*864e5).toISOString().slice(0,10);
+function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(toast.x);toast.x=setTimeout(()=>t.hidden=true,4500)}
+async function sha(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('fath:'+t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+
+/* ===== DATA CONTOH (satu sumber data untuk semua menu) ===== */
+function contoh(){
+  let s=11;const R=()=>(s=s*16807%2147483647)/2147483647,P=a=>a[Math.floor(R()*a.length)];
+  const base=Date.UTC(2026,8,15)/864e5;
+  const U={Kebidanan:{dx:['O14.1','O42.0','O60.1','O80','O99.0','N91.2'],tx:['73.59','73.6','74.1','74.99','99.04'],lo:2,hi:4},
+           Perinatal:{dx:['P07.3','P22.0','P36.9','P59.9','Q21.0','Q37.9','Q65.0','Q90.9'],tx:['99.83','93.90','96.04','38.93','87.44'],lo:4,hi:7},
+           Urologi:{dx:['N39.0','N18.9','N20.0','N40'],tx:['57.94','60.29','56.0','89.52'],lo:3,hi:6}};
+  const cc={Kebidanan:[0,0],Perinatal:[0,0],Urologi:[0,0]};
+  const nm=Object.keys(U);
+  const kecs=[['Gondokusuman',-7.7829,110.3794],['Jetis',-7.7792,110.3640],['Umbulharjo',-7.8100,110.3891],['Kotagede',-7.8283,110.3999],['Mergangsan',-7.8150,110.3680],['Tegalrejo',-7.7770,110.3500],['Danurejan',-7.7960,110.3730]];
+  const pk={identitas:.97,anamnesis:.88,pemeriksaan:.8,diagnosis:.92,tindakan:.85,persetujuan:.7,ttd_dokter:.82};
+  const rm=[];
+  for(let i=0;i<78;i++){
+    const open=i>=72,u=open?nm[i%3]:P(nm),m=open?base+54+(i-72):base+Math.floor(R()*50);
+    const los=U[u].lo+Math.floor(R()*(U[u].hi-U[u].lo+1));
+    const c=cc[u],dxk=U[u].dx[c[0]++%U[u].dx.length],txk=i%3===2?'':U[u].tx[c[1]++%U[u].tx.length];
+    const r={no_rm:'RM-'+String(i+1).padStart(4,'0'),unit:u,kecamatan:P(kecs)[0],tgl_masuk:iso(m),tgl_keluar:open?'':iso(m+los),kode_dx:dxk,kode_tindakan:txk};
+    Object.keys(pk).forEach(k=>r[k]=R()<pk[k]?1:0);
+    rm.push(r);
+  }
+  const I10=[['N39.0','Infeksi saluran kemih, lokasi tidak spesifik'],['N18.9','Penyakit ginjal kronik, tidak spesifik'],['N20.0','Batu ginjal'],['N40','Hiperplasia prostat'],['N91.2','Amenore, tidak spesifik'],['O14.1','Pre-eklampsia berat'],['O42.0','Ketuban pecah dini, persalinan dalam 24 jam'],['O60.1','Persalinan prematur dengan persalinan'],['O80','Persalinan spontan tunggal'],['O99.0','Anemia yang memperberat kehamilan'],['P07.3','Bayi prematur lainnya'],['P22.0','Sindrom gawat napas pada bayi baru lahir'],['P36.9','Sepsis bakteri pada bayi baru lahir'],['P59.9','Ikterus neonatorum, tidak spesifik'],['Q21.0','Defek septum ventrikel'],['Q37.9','Sumbing langit-langit unilateral'],['Q65.0','Dislokasi panggul kongenital unilateral'],['Q90.9','Sindrom Down, tidak spesifik']];
+  const I9=[['73.59','Persalinan dibantu manual lainnya'],['73.6','Episiotomi'],['74.1','Seksio sesarea servikal rendah'],['74.99','Seksio sesarea lainnya, tipe tidak spesifik'],['99.04','Transfusi sel darah merah (packed cells)'],['89.52','Elektrokardiogram'],['87.44','Foto toraks rutin'],['57.94','Pemasangan kateter urin menetap'],['60.29','Prostatektomi transuretral lainnya'],['56.0','Pengangkatan sumbatan ureter dan pelvis ginjal secara transuretral'],['99.83','Fototerapi lainnya'],['93.90','Continuous positive airway pressure (CPAP)'],['96.04','Pemasangan pipa endotrakeal'],['38.93','Kateterisasi vena lainnya']];
+  return{icd:I10.map(x=>({versi:'ICD-10',kode:x[0],diagnosis:x[1]})).concat(I9.map(x=>({versi:'ICD-9-CM',kode:x[0],diagnosis:x[1]}))),
+         bed:[{unit:'Kebidanan',tt:3},{unit:'Perinatal',tt:3},{unit:'Urologi',tt:3}],
+         kec:kecs.map(k=>({kecamatan:k[0],lat:k[1],lng:k[2]})),rm:rm};
+}
+let D=null;try{D=JSON.parse(localStorage.getItem(KD))}catch(e){}
+if(!D||!['icd','bed','kec','rm'].every(k=>Array.isArray(D[k])))D=contoh();
+function simpan(){try{localStorage.setItem(KD,JSON.stringify(D))}catch(e){toast('Penyimpanan browser penuh atau diblokir.')}}
+
+/* ===== LOGIN ===== */
+let gagal=0,kunciSampai=0,aktif=Date.now();
+$('#fl').addEventListener('submit',async e=>{
+  e.preventDefault();const el=$('#el');el.textContent='';
+  if(Date.now()<kunciSampai){el.textContent='Terlalu banyak percobaan. Tunggu sebentar.';return}
+  const u=$('#u').value.trim().toLowerCase(),p=$('#p').value;
+  if(!u||!p){el.textContent='Isi username dan password.';return}
+  if(!window.crypto||!crypto.subtle){el.textContent='Buka lewat https (GitHub Pages) agar login berfungsi.';return}
+  const h=await sha(p),tersimpan=localStorage.getItem(KU)||await sha(CFG.pwAwal);
+  if(u===CFG.user&&h===tersimpan){gagal=0;sessionStorage.setItem(KS,'1');$('#p').value='';mulai()}
+  else{gagal++;if(gagal>=CFG.maksGagal){kunciSampai=Date.now()+CFG.kunciDetik*1000;gagal=0}el.textContent='Username atau password salah.'}
+});
+function keluar(m){sessionStorage.removeItem(KS);$('#app').hidden=true;$('#login').hidden=false;$('#el').textContent=m||'';$('#u').value=''}
+$('#bout').onclick=()=>keluar('Anda sudah keluar.');
+['click','keydown','touchstart'].forEach(n=>document.addEventListener(n,()=>aktif=Date.now()));
+setInterval(()=>{if(sessionStorage.getItem(KS)&&Date.now()-aktif>CFG.idleMenit*60000)keluar('Sesi berakhir karena tidak ada aktivitas.')},30000);
+$('#bpw').onclick=()=>{$('#fpw').reset();$('#epw').textContent='';$('#dpw').showModal()};
+$('#bx').onclick=()=>$('#dpw').close();
+$('#fpw').addEventListener('submit',async e=>{
+  e.preventDefault();const lama=$('#pl').value,baru=$('#pb').value,er=$('#epw');
+  const tersimpan=localStorage.getItem(KU)||await sha(CFG.pwAwal);
+  if(await sha(lama)!==tersimpan){er.textContent='Password lama tidak cocok.';return}
+  if(baru.length<8){er.textContent='Password baru minimal 8 karakter.';return}
+  if(baru===lama){er.textContent='Password baru harus berbeda.';return}
+  localStorage.setItem(KU,await sha(baru));$('#dpw').close();toast('Password berhasil diganti.');
+});
+
+/* ===== MENU ===== */
+const I={
+ dashboard:'<path d="M5 21V11M12 21V4M19 21v-7"/>',
+ icd:'<path d="M8 6l-5 6 5 6M16 6l5 6-5 6"/>',
+ peta:'<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+ audit:'<path d="M9 4h6v3H9zM7 5H5v16h14V5h-2M8.5 14l2.5 2.5 4.5-5"/>',
+ ri:'<path d="M3 19V6M3 14h18v5M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="1.6"/>'};
+const MENU=[['dashboard','Dashboard'],['icd','ICD-10 dan ICD-9'],['peta','Peta Persebaran'],['audit','Informasi Audit'],['ri','Rawat Inap (BOR, LOS, TOI, BTO)']];
+let tabAktif='dashboard',charts=[],peta=null;
+function bangunTab(){
+  $('#tb').innerHTML=MENU.map(m=>`<button data-id="${m[0]}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[m[0]]}</svg>${m[1]}</button>`).join('');
+  $('#tb').querySelectorAll('button').forEach(b=>b.onclick=()=>buka(b.dataset.id));
+}
+$('#kiri').onclick=()=>$('#tb').scrollBy({left:-220,behavior:'smooth'});
+$('#kanan').onclick=()=>$('#tb').scrollBy({left:220,behavior:'smooth'});
+function mulai(){$('#login').hidden=true;$('#app').hidden=false;aktif=Date.now();bangunTab();buka('dashboard')}
+function hancurkan(){charts.forEach(c=>c.destroy());charts=[]}
+function buka(id){
+  tabAktif=id;hancurkan();if(peta){peta.remove();peta=null}
+  if(window.Chart)Chart.defaults.color=getComputedStyle(document.body).color;
+  $('#tb').querySelectorAll('button').forEach(b=>b.dataset.id===id?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
+  ({dashboard:rDash,icd:rIcd,peta:rPeta,audit:rAudit,ri:rRI})[id]();
+  window.scrollTo(0,0);
+}
+
+/* ===== IMPOR / EKSPOR EXCEL ===== */
+const norm=k=>String(k).trim().toLowerCase().replace(/\s+/g,'_');
+const NAMA={rm:'Data berkas pasien',icd:'Kamus ICD',bed:'Tempat tidur',kec:'Koordinat kecamatan',semua:'Semua data'};
+function toolbar(k){
+  return `<div class="ak"><button class="btn n s" data-a="tpl">Unduh template</button><button class="btn n s" data-a="exp">Unduh data</button><button class="btn s" data-a="imp">Impor Excel: ${NAMA[k]}</button><button class="btn n s" data-a="rst">Reset ke contoh</button></div>`;
+}
+function pasangToolbar(k){
+  document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{
+    const a=b.dataset.a,C=contoh(),pick=src=>k==='semua'?src:{[k]:src[k]};
+    if(a==='tpl')unduh(pick(C),'template_'+k);
+    if(a==='exp')unduh(pick(D),'data_'+k);
+    if(a==='imp'){$('#fx').value='';$('#fx').onchange=ev=>impor(k,ev.target.files[0]);$('#fx').click()}
+    if(a==='rst'&&confirm('Kembalikan '+NAMA[k].toLowerCase()+' ke data contoh? Data Anda akan terhapus.')){
+      Object.keys(pick(C)).forEach(x=>D[x]=C[x]);simpan();buka(tabAktif);toast('Data dikembalikan ke contoh.')}
+  });
+}
+function unduh(obj,nama){
+  const wb=XLSX.utils.book_new();
+  Object.keys(obj).forEach(k=>XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(obj[k]),k));
+  XLSX.writeFile(wb,nama+'.xlsx');
+}
+function tgl(v){
+  if(v===''||v==null)return '';
+  if(typeof v==='number'){const p=XLSX.SSF.parse_date_code(v);return p?`${p.y}-${String(p.m).padStart(2,'0')}-${String(p.d).padStart(2,'0')}`:''}
+  const s=String(v).trim();let m=/^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(s);
+  if(m)return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
+  m=/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/.exec(s);
+  return m?`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`:'';
+}
+const WAJIB={icd:['kode','diagnosis'],bed:['unit','tt'],kec:['kecamatan','lat','lng'],rm:['no_rm','unit','tgl_masuk']};
+function terapkan(k,raw){
+  const rows=raw.map(r=>{const o={};Object.keys(r).forEach(x=>o[norm(x)]=r[x]);return o});
+  if(!rows.length)return `${NAMA[k]}: file kosong.`;
+  const hilang=WAJIB[k].filter(w=>!(w in rows[0]));
+  if(hilang.length)return `${NAMA[k]}: kolom wajib tidak ada (${hilang.join(', ')}). Unduh template untuk contoh.`;
+  let out;
+  if(k==='icd')out=rows.filter(r=>String(r.kode).trim()).map(r=>{const kode=String(r.kode).trim().toUpperCase(),v=String(r.versi||'');
+    return{versi:v?(/9/.test(v)?'ICD-9-CM':'ICD-10'):(/^[A-Z]/.test(kode)?'ICD-10':'ICD-9-CM'),kode:kode,diagnosis:String(r.diagnosis).trim()}});
+  else if(k==='bed')out=rows.filter(r=>String(r.unit).trim()&&isFinite(Number(r.tt))).map(r=>({unit:String(r.unit).trim(),tt:Number(r.tt)}));
+  else if(k==='kec')out=rows.map(r=>({kecamatan:String(r.kecamatan).trim(),lat:parseFloat(r.lat),lng:parseFloat(r.lng)})).filter(r=>r.kecamatan&&isFinite(r.lat)&&isFinite(r.lng));
+  else{
+    out=rows.map(r=>{r.tgl_masuk=tgl(r.tgl_masuk);r.tgl_keluar=tgl(r.tgl_keluar);r.no_rm=String(r.no_rm).trim();r.unit=String(r.unit).trim();
+      if('kecamatan' in r)r.kecamatan=String(r.kecamatan).trim();if('kode_dx' in r)r.kode_dx=String(r.kode_dx).trim().toUpperCase();if('kode_tindakan' in r)r.kode_tindakan=String(r.kode_tindakan).trim();return r})
+      .filter(r=>r.no_rm&&r.unit&&r.tgl_masuk);
+  }
+  if(!out.length)return `${NAMA[k]}: tidak ada baris yang valid.`;
+  D[k]=out;return `${NAMA[k]}: ${out.length} baris`+(out.length<rows.length?` (${rows.length-out.length} baris dilewati karena tidak valid)`:'');
+}
+async function impor(k,file){
+  if(!file)return;
+  try{
+    const wb=XLSX.read(await file.arrayBuffer(),{type:'array'});
+    const target=k==='semua'?Object.keys(WAJIB):[k],pesan=[];
+    target.forEach(t=>{
+      const nm=k==='semua'?wb.SheetNames.find(n=>n.toLowerCase()===t):wb.SheetNames[0];
+      if(nm)pesan.push(terapkan(t,XLSX.utils.sheet_to_json(wb.Sheets[nm],{defval:''})));
+    });
+    if(!pesan.length){toast('Tidak ada sheet bernama rm, icd, bed, atau kec.');return}
+    simpan();buka(tabAktif);toast('Impor: '+pesan.join('; '));
+  }catch(e){toast('File tidak dapat dibaca. Pakai .xlsx, .xls, atau .csv.')}
+}
+const kepala=(j,k)=>`<div class="bar"><div><h2>${j}</h2><span class="note" style="margin:0">Berdasarkan ${D.rm.length} berkas pasien (sumber data sama di semua menu)</span></div>${toolbar(k)}</div>`;
+
+/* ===== PERHITUNGAN AUDIT ===== */
+const komp=r=>Object.keys(r).filter(k=>!TETAP.includes(k));
+const kompSemua=()=>[...new Set(D.rm.flatMap(komp))];
+const terisi=v=>{v=String(v??'').trim().toLowerCase();return v!==''&&!['0','tidak','tidak lengkap','no','false','-','x'].includes(v)};
+const skor=r=>{const ks=komp(r);return ks.length?Math.round(ks.filter(k=>terisi(r[k])).length/ks.length*100):0};
+const kls=s=>s>=100?'':s>=80?'w':'k';
+const labelK=k=>k.replace(/_/g,' ');
+const rataSkor=A=>A.length?Math.round(A.reduce((a,r)=>a+skor(r),0)/A.length):0;
+const SARAN={
+ identitas:'Minta petugas pendaftaran memeriksa kelengkapan identitas (nama, tanggal lahir, alamat, No. RM) sebelum berkas dikirim ke ruang rawat.',
+ anamnesis:'Jadikan anamnesis bagian dari checklist asesmen awal dan ingatkan DPJP atau PPA mengisinya saat pasien masuk.',
+ pemeriksaan:'Gunakan format pemeriksaan fisik dan penunjang yang terstruktur supaya tidak ada bagian terlewat.',
+ diagnosis:'Minta dokter menulis diagnosis utama dan sekunder sebelum pasien pulang, agar kodifikasi ICD-10 akurat.',
+ tindakan:'Periksa pencatatan tindakan dan laporan operasi; kode ICD-9-CM bergantung pada catatan ini.',
+ persetujuan:'Wajibkan persetujuan tindakan (informed consent) ditandatangani sebelum tindakan, dan tambahkan ke checklist pra-tindakan.',
+ ttd:'Terapkan verifikasi tanda tangan dan nama terang dokter saat pasien keluar, lalu jadwalkan pelengkapan retrospektif.'};
+function saran(k){const x=Object.keys(SARAN).find(s=>k.includes(s));return x?SARAN[x]:`Cari penyebab komponen "${labelK(k)}" sering kosong (formulir, alur kerja, atau kebiasaan pengisian), lalu sosialisasikan pengisiannya.`}
+function rekomAudit(){
+  const A=D.rm,n=A.length;if(!n)return[];
+  const rata=rataSkor(A),out=[];
+  out.push({l:kls(rata),j:`Kelengkapan rata-rata ${rata}% dari target 100%`,t:rata>=100?'Seluruh komponen terisi. Pertahankan dengan audit rutin tiap bulan.':`Masih ada selisih ${100-rata} poin dari target. Prioritaskan komponen dengan persentase terendah di bawah ini.`});
+  kompSemua().map(k=>[k,Math.round(A.filter(r=>terisi(r[k])).length/n*100)]).filter(x=>x[1]<100).sort((a,b)=>a[1]-b[1])
+    .forEach(x=>out.push({l:x[1]<80?'k':'w',j:`Komponen "${labelK(x[0])}" baru ${x[1]}% lengkap`,t:saran(x[0])}));
+  const unit=[...new Set(A.map(r=>r.unit))].map(u=>[u,rataSkor(A.filter(r=>r.unit===u))]).sort((a,b)=>a[1]-b[1]);
+  if(unit.length>1&&unit[0][1]<100)out.push({l:kls(unit[0][1]),j:`Unit ${unit[0][0]} paling rendah (${unit[0][1]}%)`,t:`Fokuskan pembinaan dan pengecekan berkas di unit ini lebih dulu. Unit tertinggi: ${unit[unit.length-1][0]} (${unit[unit.length-1][1]}%).`});
+  const tdk=A.filter(r=>skor(r)<100).length;
+  if(tdk)out.push({l:'w',j:`${tdk} dari ${n} berkas perlu dilengkapi`,t:'Kembalikan berkas ke DPJP atau PPA terkait. Gunakan filter "Belum lengkap" pada tabel di bawah untuk melihat daftarnya.'});
+  const tanpa=A.filter(r=>!String(r.kode_dx||'').trim()).length;
+  if(tanpa)out.push({l:'w',j:`${tanpa} berkas belum memiliki kode diagnosis`,t:'Jadwalkan koding ICD-10 sebelum berkas dikirim untuk klaim atau pelaporan.'});
+  return out;
+}
+const rekHtml=L=>L.length?L.map(r=>`<div class="rek"><span class="pill ${r.l}">${r.l==='k'?'Prioritas tinggi':r.l==='w'?'Perlu perhatian':'Baik'}</span><b>${esc(r.j)}</b><p>${esc(r.t)}</p></div>`).join(''):'<p class="note">Belum ada data untuk dianalisis.</p>';
+
+/* ===== PERHITUNGAN RAWAT INAP ===== */
+function batas(){let lo=1e9,hi=-1;D.rm.forEach(r=>[dn(r.tgl_masuk),dn(r.tgl_keluar)].forEach(x=>{if(x!=null){lo=Math.min(lo,x);hi=Math.max(hi,x)}}));return hi<0?null:[lo,hi+1]}
+function rentang(p,B){if(!p)return B;const a=p.split('-').map(Number);return[Math.max(B[0],Date.UTC(a[0],a[1]-1,1)/864e5),Math.min(B[1],Date.UTC(a[0],a[1],1)/864e5)]}
+function hitung(unit,a,b){
+  const tt=D.bed.filter(x=>!unit||x.unit===unit).reduce((s,x)=>s+x.tt,0),hari=Math.max(0,b-a);
+  let hp=0,k=0,ld=0;
+  D.rm.filter(r=>!unit||r.unit===unit).forEach(r=>{
+    const m=dn(r.tgl_masuk);if(m==null)return;const kk=dn(r.tgl_keluar),e=kk==null?Infinity:Math.max(kk,m+1);
+    hp+=Math.max(0,Math.min(e,b)-Math.max(m,a));
+    if(kk!=null&&kk>=a&&kk<b){k++;ld+=Math.max(kk-m,1)}
+  });
+  const cap=tt*hari;
+  return{tt,hari,hp,k,ld,bor:cap?hp/cap*100:null,los:k?ld/k:null,toi:k?Math.max(0,cap-hp)/k:null,bto:cap?k*365/cap:null};
+}
+const IDEAL={bor:[60,85,'%','Bed Occupancy Rate'],los:[6,9,' hari','Length of Stay'],toi:[1,3,' hari','Turn Over Interval'],bto:[40,50,' kali/tahun','Bed Turn Over']};
+function status(k,v){if(v==null)return['w','Belum ada data'];const i=IDEAL[k];return v<i[0]?['w','Di bawah ideal']:v>i[1]?['k','Di atas ideal']:['','Ideal']}
+function rekomRI(h){
+  const o=[];if(h.bor==null)return o;
+  if(h.bor<60)o.push({l:'w',j:`BOR ${f(h.bor)}% di bawah ideal`,t:'Tempat tidur kurang termanfaatkan. Tinjau jumlah tempat tidur yang aktif, perkuat rujukan masuk, dan cek apakah ada tempat tidur yang tidak terpakai karena perawatan atau kerusakan.'});
+  else if(h.bor>85)o.push({l:'k',j:`BOR ${f(h.bor)}% di atas ideal`,t:'Hunian terlalu padat. Pertimbangkan penambahan tempat tidur, percepat proses pemulangan, dan siapkan rencana saat ruang penuh.'});
+  else o.push({l:'',j:`BOR ${f(h.bor)}% ideal`,t:'Pemanfaatan tempat tidur sudah baik. Pantau tiap bulan.'});
+  if(h.los!=null){
+    if(h.los>9)o.push({l:'k',j:`LOS ${f(h.los)} hari melebihi ideal`,t:'Tinjau jalur klinis (clinical pathway), keterlambatan hasil penunjang, dan kendala administrasi pemulangan.'});
+    else if(h.los<6)o.push({l:'w',j:`LOS ${f(h.los)} hari di bawah ideal`,t:'Pastikan pemulangan tidak terlalu dini: periksa angka pasien kembali dirawat dan kesesuaian dengan kasus. Pada unit dengan kasus singkat, angka ini bisa wajar.'});
+  }
+  if(h.toi!=null){
+    if(h.toi>3)o.push({l:'w',j:`TOI ${f(h.toi)} hari terlalu lama`,t:'Tempat tidur kosong terlalu lama sebelum terisi lagi. Cek alur penerimaan pasien dan kecepatan pembersihan ruangan.'});
+    else if(h.toi<1)o.push({l:'k',j:`TOI ${f(h.toi)} hari terlalu singkat`,t:'Tempat tidur hampir tidak pernah kosong. Ini tanda beban tinggi; evaluasi kapasitas.'});
+  }
+  if(h.bto!=null){
+    if(h.bto<40)o.push({l:'w',j:`BTO ${f(h.bto)} kali/tahun di bawah ideal`,t:'Tempat tidur jarang berganti pasien. Tinjau pemanfaatan layanan dan lama perawatan.'});
+    else if(h.bto>50)o.push({l:'k',j:`BTO ${f(h.bto)} kali/tahun di atas ideal`,t:'Pergantian pasien sangat cepat. Pastikan mutu perawatan dan beban kerja petugas tetap terjaga.'});
+  }
+  return o;
+}
+
+/* ===== SINKRONISASI ===== */
+function sinkron(){
+  const N=D.rm.length,kc=new Set(D.kec.map(x=>x.kecamatan.toLowerCase())),kd=new Set(D.icd.map(x=>x.kode));
+  const p=D.rm.filter(r=>kc.has(String(r.kecamatan||'').toLowerCase())).length;
+  const ri=D.rm.filter(r=>dn(r.tgl_masuk)!=null).length;
+  const dx=D.rm.filter(r=>kd.has(String(r.kode_dx||'').toUpperCase())).length;
+  const kt=new Set(D.icd.filter(x=>x.versi==='ICD-9-CM').map(x=>x.kode)),adaTx=D.rm.filter(r=>String(r.kode_tindakan||'').trim()),tx=adaTx.filter(r=>kt.has(String(r.kode_tindakan).trim())).length;
+  return[['Dashboard dan Informasi Audit',N,N],['Peta Persebaran (kecamatan terdaftar)',p,N],['Rawat Inap (punya tanggal masuk)',ri,N],['ICD-10 (kode diagnosis ada di kamus)',dx,N],['ICD-9-CM (kode tindakan ada di kamus)',tx,adaTx.length]].map(x=>({n:x[0],a:x[1],N:x[2]}));
+}
+const petaCount=()=>{const c={};D.rm.forEach(r=>{const k=String(r.kecamatan||'').toLowerCase();c[k]=(c[k]||0)+1});return c};
+
+/* ===== DASHBOARD ===== */
+function rDash(){
+  const A=D.rm,n=A.length,B=batas(),h=B?hitung('',B[0],B[1]):{},open=A.filter(r=>dn(r.tgl_keluar)==null).length;
+  const tersedia=D.bed.reduce((s,x)=>s+x.tt,0)-open;
+  $('#mn').innerHTML=kepala('Dashboard','semua')+`
+  <div class="kpi">
+   <div class="card"><b>${n}</b><span>Berkas pasien</span></div>
+   <div class="card"><b>${rataSkor(A)}%</b><span>Rata-rata kelengkapan</span></div>
+   <div class="card"><b>${f(h.bor)}%</b><span>BOR</span></div>
+   <div class="card"><b>${f(h.los)}</b><span>LOS (hari)</span></div>
+   <div class="card"><b>${Math.max(0,tersedia)} / ${D.bed.reduce((s,x)=>s+x.tt,0)}</b><span>Tempat tidur kosong / total</span></div></div>
+  <div class="g2"><div class="card"><h3>Kelengkapan per komponen</h3><canvas id="c1" height="230"></canvas></div>
+  <div class="card"><h3>Pasien per kecamatan</h3><canvas id="c2" height="230"></canvas></div></div>
+  <div class="g2" style="grid-template-columns:1fr 1fr"><div class="card"><h3>Pemeriksaan keselarasan data</h3>
+   ${sinkron().map(s=>`<div class="sy"><span>${s.n}</span><span>${s.a} dari ${s.N} <span class="pill ${s.a===s.N?'':'w'}">${s.a===s.N?'Sinkron':'Perlu dicek'}</span></span></div>`).join('')}
+   <p class="note">Semua menu menghitung dari satu daftar berkas yang sama, sehingga jumlahnya selalu sama. Angka "Perlu dicek" berarti ada nama kecamatan, kode ICD, atau tanggal yang belum cocok dengan tabel acuan.</p></div>
+  <div class="card"><h3>Rekomendasi utama</h3>${rekHtml(rekomAudit().slice(0,3))}</div></div>
+  <p class="note">Ubah data lewat Excel: "Impor Excel: Semua data" menerima satu file dengan sheet bernama rm, icd, bed, dan kec.</p>`;
+  pasangToolbar('semua');
+  if(!window.Chart)return;
+  const ks=kompSemua();
+  charts.push(new Chart($('#c1'),{type:'bar',data:{labels:ks.map(labelK),datasets:[{data:ks.map(k=>n?Math.round(A.filter(r=>terisi(r[k])).length/n*100):0),backgroundColor:'#0E7C72',borderRadius:6}]},options:{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{max:100,ticks:{callback:v=>v+'%'}}}}}));
+  const pc=petaCount(),P=Object.keys(pc).map(k=>[k,pc[k]]).sort((a,b)=>b[1]-a[1]);
+  charts.push(new Chart($('#c2'),{type:'doughnut',data:{labels:P.map(x=>x[0].replace(/^./,c=>c.toUpperCase())||'(kosong)'),datasets:[{data:P.map(x=>x[1]),backgroundColor:['#0E7C72','#7FE0CF','#F2B134','#5FA8B3','#D93F4C','#0A3F3B','#9CC4BD','#B9CFC9']}]},options:{plugins:{legend:{position:'bottom'}}}}));
+}
+
+/* ===== ICD ===== */
+function rIcd(){
+  let ver='';
+  const cd={},ct={};D.rm.forEach(r=>{const a=String(r.kode_dx||'').toUpperCase(),b=String(r.kode_tindakan||'').trim();if(a)cd[a]=(cd[a]||0)+1;if(b)ct[b]=(ct[b]||0)+1});
+  const pakai=r=>(r.versi==='ICD-9-CM'?ct[r.kode]:cd[r.kode])||0;
+  const pk=v=>{const L=D.icd.filter(r=>r.versi===v);return[L.filter(r=>pakai(r)>0).length,L.length]},p10=pk('ICD-10'),p9=pk('ICD-9-CM');
+  $('#mn').innerHTML=kepala('Kodifikasi ICD-10 dan ICD-9-CM','icd')+`<div class="kpi"><div class="card"><b>${D.rm.length}</b><span>Berkas pasien</span></div><div class="card"><b>${p10[0]} / ${p10[1]}</b><span>Kode ICD-10 terpakai di berkas</span></div><div class="card"><b>${p9[0]} / ${p9[1]}</b><span>Kode ICD-9-CM terpakai di berkas</span></div></div><div class="card"><input class="in" id="q" placeholder="Ketik kode atau nama, misalnya: prematur, 74.1, N39" aria-label="Cari ICD">
+  <div class="chips"><button class="chip" data-v="" aria-pressed="true">Semua</button><button class="chip" data-v="ICD-10" aria-pressed="false">ICD-10 (diagnosis)</button><button class="chip" data-v="ICD-9-CM" aria-pressed="false">ICD-9-CM (tindakan)</button></div>
+  <div class="tw"><table><thead><tr><th>Versi</th><th>Kode</th><th>Nama</th><th>Dipakai di berkas</th></tr></thead><tbody id="ti"></tbody></table></div><p class="note" id="ni"></p></div>`;
+  pasangToolbar('icd');
+  const tampil=()=>{
+    const q=$('#q').value.trim().toLowerCase();
+    const hs=D.icd.filter(r=>(!ver||r.versi===ver)&&(!q||r.kode.toLowerCase().includes(q)||r.diagnosis.toLowerCase().includes(q)));
+    $('#ti').innerHTML=hs.slice(0,100).map(r=>`<tr><td><span class="pill ${r.versi==='ICD-9-CM'?'w':''}">${esc(r.versi)}</span></td><td><b>${esc(r.kode)}</b></td><td>${esc(r.diagnosis)}</td><td>${pakai(r)}</td></tr>`).join('')||'<tr><td colspan="4">Tidak ada yang cocok. Coba kata kunci lain.</td></tr>';
+    $('#ni').textContent=(hs.length>100?'Menampilkan 100 dari '+hs.length+' hasil. Persempit pencarian. ':hs.length+' hasil. ')+'Kolom "Dipakai di berkas" dihitung dari data berkas pasien.';
+  };
+  $('#q').oninput=tampil;
+  document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{ver=c.dataset.v;document.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===c));tampil()});
+  tampil();
+}
+
+/* ===== PETA ===== */
+function rPeta(){
+  const pc=petaCount(),kc=new Set(D.kec.map(x=>x.kecamatan.toLowerCase()));
+  const tanpa=Object.keys(pc).filter(k=>!kc.has(k)),jTanpa=tanpa.reduce((s,k)=>s+pc[k],0);
+  const baris=D.kec.map(r=>({...r,j:pc[r.kecamatan.toLowerCase()]||0})).sort((a,b)=>b.j-a.j),tot=baris.reduce((s,r)=>s+r.j,0);
+  $('#mn').innerHTML=kepala('Peta persebaran asal pasien','kec')+`<div class="g2" style="grid-template-columns:1.6fr 1fr"><div id="map" role="img" aria-label="Peta sebaran pasien per kecamatan"></div>
+  <div class="card"><h3>Per kecamatan (${tot} dari ${D.rm.length} berkas)</h3><div class="tw"><table><thead><tr><th>Kecamatan</th><th>Pasien</th></tr></thead><tbody>${baris.map(r=>`<tr><td>${esc(r.kecamatan)}</td><td>${r.j}</td></tr>`).join('')}</tbody></table></div>
+  ${jTanpa?`<p class="note"><span class="pill w">Perlu dicek</span> ${jTanpa} berkas memakai kecamatan yang belum ada koordinatnya: ${esc(tanpa.join(', ')||'(kosong)')}. Tambahkan di sheet kec.</p>`:'<p class="note">Semua berkas sudah punya kecamatan yang terdaftar.</p>'}
+  <p class="note">Jumlah pasien dihitung otomatis dari data berkas. Tabel ini hanya perlu kolom kecamatan, lat, lng (koordinat dari Google Maps: klik kanan pada peta).</p></div></div>`;
+  pasangToolbar('kec');
+  if(!window.L){$('#map').textContent='Peta gagal dimuat. Periksa koneksi internet.';return}
+  peta=L.map('map');
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; OpenStreetMap'}).addTo(peta);
+  const mx=Math.max(1,...baris.map(r=>r.j)),grp=[];
+  baris.forEach(r=>{
+    const c=L.circleMarker([r.lat,r.lng],{radius:8+22*Math.sqrt(r.j/mx),color:'#0A3F3B',weight:2,fillColor:'#0E7C72',fillOpacity:.55}).addTo(peta);
+    c.bindTooltip(esc(r.kecamatan)+': '+r.j+' pasien');grp.push(c);
+  });
+  if(grp.length)peta.fitBounds(L.featureGroup(grp).getBounds().pad(.3));else peta.setView([-7.8,110.37],12);
+  setTimeout(()=>peta&&peta.invalidateSize(),100);
+}
+
+/* ===== AUDIT ===== */
+function rAudit(){
+  const A=D.rm,ks=kompSemua(),n=A.length;let saring=false;
+  const penuh=A.filter(r=>skor(r)===100).length;
+  $('#mn').innerHTML=kepala('Informasi audit kelengkapan','rm')+`
+  <div class="kpi"><div class="card"><b>${n}</b><span>Berkas diaudit</span></div><div class="card"><b>${rataSkor(A)}%</b><span>Rata-rata kelengkapan</span></div>
+   <div class="card"><b>${penuh}</b><span>Berkas lengkap 100%</span></div><div class="card"><b>${n-penuh}</b><span>Berkas belum lengkap</span></div></div>
+  <div class="card"><h3>Rekomendasi dari hasil analisis</h3>${rekHtml(rekomAudit())}</div>
+  <div class="card"><h3>Daftar berkas</h3><div class="chips"><button class="chip" data-s="0" aria-pressed="true">Semua</button><button class="chip" data-s="1" aria-pressed="false">Belum lengkap</button></div>
+  <div class="tw"><table><thead><tr><th>No. RM</th><th>Unit</th><th>Masuk</th>${ks.map(k=>`<th>${esc(labelK(k))}</th>`).join('')}<th>Kelengkapan</th></tr></thead><tbody id="ta"></tbody></table></div><p class="note" id="na"></p>
+  <p class="note">Kolom wajib sheet rm: no_rm, unit, tgl_masuk. Kolom opsional: tgl_keluar, kecamatan, kode_dx, kode_tindakan. Kolom lain otomatis dihitung sebagai komponen audit (1 atau Ya jika ada, 0 atau kosong jika tidak). Pada Excel, format kolom kode_tindakan sebagai Teks agar angka nol di belakang tidak hilang.</p></div>`;
+  pasangToolbar('rm');
+  const tampil=()=>{
+    const L=A.filter(r=>!saring||skor(r)<100);
+    $('#ta').innerHTML=L.slice(0,100).map(r=>{const s=skor(r);return`<tr><td><b>${esc(r.no_rm)}</b></td><td>${esc(r.unit)}</td><td>${esc(r.tgl_masuk)}</td>${ks.map(k=>`<td>${terisi(r[k])?'&#10003;':'<span style="color:var(--red)">&#10007;</span>'}</td>`).join('')}<td><span class="pill ${kls(s)}">${s}%</span></td></tr>`}).join('')||`<tr><td colspan="${ks.length+4}">Tidak ada berkas.</td></tr>`;
+    $('#na').textContent=L.length>100?`Menampilkan 100 dari ${L.length} berkas.`:`${L.length} berkas.`;
+  };
+  document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{saring=c.dataset.s==='1';document.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===c));tampil()});
+  tampil();
+}
+
+/* ===== RAWAT INAP ===== */
+function rRI(){
+  const B=batas(),bulan=[];
+  if(B)for(let d=B[0];d<B[1];d+=1){const m=iso(d).slice(0,7);if(!bulan.includes(m))bulan.push(m)}
+  const open={};D.rm.forEach(r=>{if(dn(r.tgl_keluar)==null)open[r.unit]=(open[r.unit]||0)+1});
+  const tot=D.bed.reduce((s,x)=>s+x.tt,0),terisiN=D.bed.reduce((s,x)=>s+Math.min(x.tt,open[x.unit]||0),0);
+  $('#mn').innerHTML=kepala('Rawat inap: tempat tidur dan indikator','bed')+`
+  <div class="card"><h3>Ketersediaan tempat tidur saat ini</h3><div class="tw"><table><thead><tr><th>Unit</th><th>Total TT</th><th>Terisi</th><th>Tersedia</th></tr></thead><tbody>
+   ${D.bed.map(x=>{const t=Math.min(x.tt,open[x.unit]||0);return`<tr><td>${esc(x.unit)}</td><td>${x.tt}</td><td>${t}</td><td>${x.tt-t}</td></tr>`}).join('')}
+   <tr class="tot"><td>Total</td><td>${tot}</td><td>${terisiN}</td><td>${tot-terisiN}</td></tr></tbody></table></div>
+   <p class="note">"Terisi" = berkas yang belum punya tanggal keluar. Total TT diatur di sheet bed (kolom unit, tt).</p></div>
+  <div class="sel"><div><label for="su">Unit</label><select class="in" id="su"><option value="">Semua unit</option>${D.bed.map(x=>`<option>${esc(x.unit)}</option>`).join('')}</select></div>
+  <div><label for="sp">Periode</label><select class="in" id="sp"><option value="">Seluruh periode</option>${bulan.map(m=>`<option>${m}</option>`).join('')}</select></div></div>
+  <div class="kpi" id="kr"></div>
+  <div class="g2"><div class="card"><h3>BOR per bulan</h3><canvas id="cb" height="200"></canvas></div><div class="card"><h3>Rekomendasi</h3><div id="rr"></div></div></div>
+  <div class="card"><h3>Hasil perhitungan per bulan</h3><div class="tw"><table><thead><tr><th>Bulan</th><th>Hari perawatan</th><th>Pasien keluar</th><th>Total lama dirawat</th><th>BOR (%)</th><th>LOS (hari)</th><th>TOI (hari)</th><th>BTO (kali/tahun)</th></tr></thead><tbody id="tr"></tbody></table></div></div>
+  <div class="card"><h3>Rumus yang dipakai</h3><p class="note" style="margin:0">BOR = hari perawatan / (jumlah TT x jumlah hari periode) x 100. LOS = total lama dirawat pasien keluar / jumlah pasien keluar. TOI = (jumlah TT x hari periode - hari perawatan) / pasien keluar. BTO = pasien keluar / jumlah TT; nilainya diubah ke setara satu tahun agar dapat dibandingkan dengan nilai ideal. Nilai ideal mengacu pada Depkes: BOR 60-85%, LOS 6-9 hari, TOI 1-3 hari, BTO 40-50 kali per tahun. Hari perawatan dihitung dari tanggal masuk dan keluar tiap berkas; pasien yang masuk dan keluar di hari yang sama dihitung 1 hari.</p></div>`;
+  pasangToolbar('bed');
+  const tampil=()=>{
+    hancurkan();const u=$('#su').value,p=$('#sp').value;
+    if(!B){$('#kr').innerHTML='<div class="card">Belum ada data berkas. Impor sheet rm di menu Informasi Audit.</div>';return}
+    const h=hitung(u,...rentang(p,B));
+    $('#kr').innerHTML=[['bor',h.bor,1],['los',h.los,1],['toi',h.toi,1],['bto',h.bto,1]].map(x=>{const i=IDEAL[x[0]],s=status(x[0],x[1]);
+      return`<div class="card"><span>${x[0].toUpperCase()} (${i[3]})</span><b>${f(x[1])}${i[2]===('%')?'%':''}</b><span>${i[2]===('%')?'':i[2].trim()} Ideal ${i[0]}-${i[1]}${i[2].trim()}</span><span class="pill ${s[0]}">${s[1]}</span></div>`}).join('');
+    $('#rr').innerHTML=rekHtml(rekomRI(h));
+    const rows=bulan.map(m=>[m,hitung(u,...rentang(m,B))]),all=hitung(u,...rentang('',B));
+    const bar=(m,x,c)=>`<tr${c?' class="tot"':''}><td>${m}</td><td>${x.hp}</td><td>${x.k}</td><td>${x.ld}</td><td>${f(x.bor)}</td><td>${f(x.los)}</td><td>${f(x.toi)}</td><td>${f(x.bto)}</td></tr>`;
+    $('#tr').innerHTML=rows.map(r=>bar(r[0],r[1])).join('')+bar('Seluruh periode',all,1);
+    if(window.Chart)charts.push(new Chart($('#cb'),{type:'line',data:{labels:rows.map(r=>r[0]),datasets:[{label:'BOR (%)',data:rows.map(r=>r[1].bor==null?null:+r[1].bor.toFixed(1)),borderColor:'#0E7C72',backgroundColor:'#0E7C72',tension:.25},{label:'Batas bawah 60%',data:rows.map(()=>60),borderColor:'#F2B134',borderDash:[6,4],pointRadius:0},{label:'Batas atas 85%',data:rows.map(()=>85),borderColor:'#D93F4C',borderDash:[6,4],pointRadius:0}]},options:{scales:{y:{min:0,max:100}},plugins:{legend:{position:'bottom'}}}}));
+  };
+  $('#su').onchange=tampil;$('#sp').onchange=tampil;tampil();
+}
+
+if(sessionStorage.getItem(KS))mulai();
+</script>
+</body>
+</html>
